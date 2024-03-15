@@ -1,4 +1,5 @@
-import {parse} from 'csv-parse';
+// import {parse} from 'csv-parse';
+import { parse, parseString } from 'fast-csv';
 
 // /**
 //  * Handles the CSV file upload and processing.
@@ -16,8 +17,12 @@ export async function upload(request: Request) {
 
     const content = await file.text();
 
+    parseString(content, { headers: true })
+    .on('error', error => console.error(error))
+    .on('data', row => console.log(row))
+    .on('end', (rowCount: number) => console.log(`Parsed ${rowCount} rows`));
 
-
+   
     // return new Response(JSON.stringify(records), {
     //     status: 200, // HTTP 200 OK
     //     headers: {
