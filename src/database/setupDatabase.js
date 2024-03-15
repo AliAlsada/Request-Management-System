@@ -1,6 +1,6 @@
 import { db } from "./db.js";
 
-async function setupDatabase() {
+export async function setupDatabase() {
 
     // SQL statement for creating the general Requests table
     const createRequestsTable = 
@@ -97,4 +97,3 @@ async function setupDatabase() {
 }
 
 
-setupDatabase();
