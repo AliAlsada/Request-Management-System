@@ -81,14 +81,17 @@ export async function setupDatabase() {
     );`;
 
     try {
-        await db.query(createRequestsTable);
-        await db.query(createNewLicenseTable);
-        await db.query(createAccountRequestTable);
-        await db.query(createInspectionRequestTable);
-        await db.query(createAddActivity);
-        await db.query(createActivities);
-        await db.query(createStampLicenceTable);
-        await db.query(createPermissionTable);
+        db.query(createRequestsTable).run();
+        db.query(createNewLicenseTable).run();
+        db.query(createAccountRequestTable).run();
+        db.query(createInspectionRequestTable).run();
+        db.query(createAddActivity).run();
+        db.query(createActivities).run();
+        db.query(createStampLicenceTable).run();
+        db.query(createPermissionTable).run();
+
+        // const tables = db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';`).all();
+        // console.log(tables);
 
         console.log("Database tables setup completed.");
     } catch (error) {
