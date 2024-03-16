@@ -16,7 +16,7 @@ export async function setupDatabase() {
         `CREATE TABLE IF NOT EXISTS NewLicense (
             LicenseRequestID INTEGER PRIMARY KEY AUTOINCREMENT,
             RequestID INTEGER,
-            LicenseType TEXT,
+            licenceType TEXT,
             IsOffice BOOLEAN,
             OfficeName TEXT,
             OfficeServiceNumber TEXT,
