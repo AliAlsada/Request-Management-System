@@ -1,16 +1,16 @@
 import { db } from "../database/db.js";
 
 interface NewLicenseRequestParams {
-    RequestID: number;
-    LicenseType: string;
-    IsOffice: boolean;
-    OfficeName: string;
-    OfficeServiceNumber: string; 
-    RequestDate: string;
+    requestId: number;
+    licenseType: string;
+    isOffice: boolean;
+    officeName: string;
+    officeServiceNumber: string; 
+    requestDate: string;
 }
 
 export async function insertNewLicenseRequest(params: NewLicenseRequestParams) {
-    const {RequestID, LicenseType, IsOffice, OfficeName, OfficeServiceNumber, RequestDate} = params
+    const {requestId, licenseType, isOffice, officeName, officeServiceNumber, requestDate} = params
 
     const insertNewLicenseQuery = `INSERT INTO NewLicense 
                 (RequestID, LicenseType, IsOffice, OfficeName, OfficeServiceNumber, RequestDate) 
@@ -19,9 +19,9 @@ export async function insertNewLicenseRequest(params: NewLicenseRequestParams) {
     const prepareQuery = db.prepare(insertNewLicenseQuery);
 
     try {
-        prepareQuery.run(RequestID, LicenseType, IsOffice, OfficeName, OfficeServiceNumber, RequestDate)
+        prepareQuery.run(requestId, licenseType, isOffice, officeName, officeServiceNumber, requestDate)
     } catch (error) {
-        console.log(`[CONSTRAIN ERROR] ${RequestID} already exists in the database`)
+        console.log(`[CONSTRAIN ERROR] ${requestId} already exists in the database`)
     }
     
 }

@@ -1,15 +1,14 @@
-// import {parse} from 'csv-parse';
-
-
+import { insertAccountRequest } from '../models/AccountRequest.ts';
+import { insertNewLicenseRequest } from '../models/NewLicenseRequest.ts';
 import {insertRequest} from '../models/Request.ts'
 import {parseCSV} from '../utils/csv-parser.ts'
-import { csv_verifier } from '../utils/csv-verifier.ts';
 
-// /**
-//  * Handles the CSV file upload and processing.
-//  * @param {Request} request - The incoming request object.
-//  * @return {Response} - The response to be sent back to the client.
-//  */
+/**
+ * Handles the CSV file upload and processing.
+ * @param {Request} request - The incoming request object.
+ * @return {Response} - The response to be sent back to the client.
+ */
+
 export async function upload(request: Request) {
     try{
         const formData = await request.formData();
@@ -43,16 +42,33 @@ export async function upload(request: Request) {
 
 async function addRowsInDatabase(rows:any){
     rows.forEach(async (row: any) => {
-        let RequestID = Number(row["RequestID"])
-        let RequestType = Number(row["RequestType"])
-        let RequestStatus = Number(row["RequestStatus"])
-
+        //extract the Requeste data column, and convert it to json object
         let RequestData = row["RequestData"]
         const obj = JSON.parse(RequestData);
 
-        let CompanyName = obj["CompanyName"]
+        let requestId = Number(row["RequestID"])
+        let requestType = Number(row["RequestType"])
+        let requestStatus = Number(row["RequestStatus"])
+        let companyName = obj["CompanyName"]
 
         
-        await insertRequest({RequestID, RequestType, RequestStatus, CompanyName})
+        await insertRequest({requestId, requestType, requestStatus, companyName})
+
+        if (requestType == 1){
+            let licenseType = obj["LicenseType"]
+            let isOffice = obj["IsOffice"]
+            let officeName = obj["OfficeName"]
+            let officeServiceNumber = obj["OfficeServiceNumber"]
+            let requestDate = obj["RequestDate"]
+            await insertNewLicenseRequest({requestId, licenseType, isOffice, officeName, officeServiceNumber, requestDate})
+        }
+
+        if (requestType == 2){
+            let requesterName = obj["RequesterName"]
+            let applicantName = obj["ApplicantName"]
+            let userName = obj["UserName"]
+            let contactEmail = obj["ContactEmail"]
+            await insertAccountRequest({requestId, requesterName, applicantName, userName, contactEmail})
+        }
     });
 }

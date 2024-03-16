@@ -1,15 +1,15 @@
 import { db } from "../database/db.js";
   
 interface insertRequestParams {
-    RequestID: number;
-    RequestType: number;
-    RequestStatus: number;
-    CompanyName: string;
+    requestId: number;
+    requestType: number;
+    requestStatus: number;
+    companyName: string;
 }
 
 export async function insertRequest(params: insertRequestParams) {
     
-    const {RequestID, RequestType, RequestStatus, CompanyName} = params
+    const {requestId, requestType, requestStatus, companyName} = params
     const insertRequestQuery = `INSERT INTO Requests 
                 (RequestID, RequestType, RequestStatus, CompanyName) 
                 VALUES (?, ?, ?, ?)`;
@@ -17,9 +17,9 @@ export async function insertRequest(params: insertRequestParams) {
     const prepareQuery = db.prepare(insertRequestQuery);
 
     try {
-        prepareQuery.run(RequestID, RequestType, RequestStatus, CompanyName)
+        prepareQuery.run(requestId, requestType, requestStatus, companyName)
     } catch (error) {
-        console.log(`[CONSTRAIN ERROR] ${RequestID} already exists in the database`)
+        console.log(`[CONSTRAIN ERROR] ${requestId} already exists in the database`)
     }
     
 }

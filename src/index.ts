@@ -17,7 +17,7 @@ Bun.serve({
 async function fetchHandler(request: Request): Promise<Response>{
     const { url, method } = request;
 
-    if (method == "POST" && url.endsWith("/csv")){
+    if (method == "POST" && url.endsWith("/requests-csv")){
         // Process the CSV file upload
         return await upload(request);
     }
