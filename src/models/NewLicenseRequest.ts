@@ -9,8 +9,6 @@ interface NewLicenseRequestParams {
     RequestDate: string;
 }
 
-
-
 export async function insertNewLicenseRequest(params: NewLicenseRequestParams) {
     const {RequestID, LicenseType, IsOffice, OfficeName, OfficeServiceNumber, RequestDate} = params
 
