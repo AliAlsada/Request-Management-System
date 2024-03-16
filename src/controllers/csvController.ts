@@ -1,7 +1,8 @@
 // import {parse} from 'csv-parse';
-import { parse, parseString } from 'fast-csv';
+
 import {insertRequest} from '../models/Request.ts'
 import {db} from '../database/db.js'
+import {parseCSV} from '../utils/csv-parser.ts'
 
 // /**
 //  * Handles the CSV file upload and processing.
@@ -9,30 +10,29 @@ import {db} from '../database/db.js'
 //  * @return {Response} - The response to be sent back to the client.
 //  */
 export async function upload(request: Request) {
+    try{
+        const formData = await request.formData();
+        const file = formData.get("file");
     
-    const formData = await request.formData();
-    const file = formData.get("file");
+        //check if the request does not contain a file or the file is not accessible
+        if (!(file instanceof File) || !file.size) {
+            return new Response("No file uploaded", { status: 400 });
+        }
+        
+        const content = await file.text();
+        const rows = await parseCSV(content); //parse the csv are return an array that contain the csv rows
+        
+        //add rows the database
+        await addRowsInDatabase(rows);
+        return new Response("File processed successfully", { 
+            status: 200,
+            headers: { "Content-Type": "application/json" }
+        });
 
-    //check if the request does not contain a file or the file is not accessible
-    if (!(file instanceof File) || !file.size) {
-        return new Response("No file uploaded", { status: 400 });
+    } catch (error) {
+        console.error("Error during file upload and processing:", error);
+        return new Response("Internal server error", { status: 500 });
     }
-
-    const content = await file.text();
-
-    let rows:any = []
-    parseString(content, { headers: true })
-        .on('Error parsing CSV:', error => console.error(error))
-        .on('data', row => rows.push(row))
-        .on('end', () => addRowsInDatabase(rows));
-
-    // return new Response(JSON.stringify(records), {
-    //     status: 200, // HTTP 200 OK
-    //     headers: {
-    //         "Content-Type": "application/json"
-    //     }
-    // });
-    return new Response("Endpoint Not Found", { status: 404 })
 }
 
 async function addRowsInDatabase(rows:any){
