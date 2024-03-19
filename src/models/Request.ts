@@ -14,7 +14,7 @@ export async function insertRequest(params: insertRequestParams) {
                 (RequestID, RequestType, RequestStatus, CompanyName) 
                 VALUES (?, ?, ?, ?)`;
 
-    const prepareQuery = db.prepare(insertRequestQuery);
+    const prepareQuery = db.query(insertRequestQuery);
 
     try {
         prepareQuery.run(requestId, requestType, requestStatus, companyName)

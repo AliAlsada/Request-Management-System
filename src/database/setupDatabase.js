@@ -23,7 +23,7 @@ export async function setupDatabase() {
        );`;
 
     const createPermissionTable =
-       `CREATE TABLE IF NOT EXISTS Permissions(
+       `CREATE TABLE IF NOT EXISTS Permission(
            PermissionID INTEGER PRIMARY KEY,
            AccountID INTEGER,
            PermissionType TEXT NOT NULL,

@@ -39,11 +39,20 @@ export async function upload(request: Request) {
         const rows = await parseCSV(content); //parse the csv are return an array that contain the csv rows
     
         //add rows the database
+        const startTime = performance.now(); 
+
         await addRowsInDatabase(rows);
+
+        const endTime = performance.now();
+        const totalDuration = (endTime - startTime) / 1000; 
+        
+        console.log(totalDuration)
+        
         return new Response("File processed successfully", { 
             status: 201,
             headers: { "Content-Type": "application/json" }
         });
+
 
     } catch (error) {
         console.error("Error during file upload and processing:", error );
@@ -86,15 +95,16 @@ async function processRow(row: RequestRow){
     }
 
     if (requestType == 2){
+        console.log(obj)
         let requesterName = obj["RequesterName"]
         let applicantName = obj["ApplicantName"]
         let userName = obj["UserName"]
         let contactEmail = obj["ContactEmail"]
-        await insertAccountRequest({requestId, requesterName, applicantName, userName, contactEmail})
+        let permissions = obj["Permissions"]
+        await insertAccountRequest({requestId, requesterName, applicantName, userName, contactEmail, permissions})
     }
 
     if (requestType == 3){
-        console.log(obj)
         let inspectionDate = obj["InspectionDate"]
         let inspectionTime = obj["InspectionTime"]
         let inspectionType = obj["inspectionType"]

@@ -17,7 +17,7 @@ export async function insertNewLicenseRequest(params: NewLicenseRequestParams) {
     const insertNewLicenseQuery = `INSERT INTO NewLicense 
                 (RequestID, LicenseType, IsOffice, OfficeName, OfficeServiceNumber, RequestDate, Activities) 
                 VALUES (?, ?, ?, ?, ?, ?, ?)`;
-
+                
     const prepareQuery = db.prepare(insertNewLicenseQuery);
 
     try {
