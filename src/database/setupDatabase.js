@@ -5,39 +5,49 @@ export async function setupDatabase() {
     // SQL statement for creating the general Requests table
     const createRequestsTable = 
         `CREATE TABLE IF NOT EXISTS Requests (
-           RequestID INTEGER PRIMARY KEY AUTOINCREMENT,
+           RequestID INTEGER PRIMARY KEY,
            RequestType INTEGER NOT NULL,
            RequestStatus INTEGER NOT NULL,
            CompanyName TEXT NOT NULL
        );`;
 
-    // SQL statement for creating the NewLicense table
+    const createAccountRequestTable =
+       `CREATE TABLE IF NOT EXISTS AccountRequest (
+           AccountID INTEGER PRIMARY KEY,
+           RequestID INTEGER,
+           RequesterName TEXT,
+           ApplicantName TEXT,
+           UserName TEXT,
+           ContactEmail TEXT,
+           FOREIGN KEY (RequestID) REFERENCES Requests(RequestID)
+       );`;
+
+    const createPermissionTable =
+       `CREATE TABLE IF NOT EXISTS Permissions(
+           PermissionID INTEGER PRIMARY KEY,
+           AccountID INTEGER,
+           PermissionType TEXT NOT NULL,
+           FOREIGN KEY (AccountID) REFERENCES AccountRequest(AccountID)
+       );`;
+
+
     const createNewLicenseTable =
         `CREATE TABLE IF NOT EXISTS NewLicense (
-            LicenseRequestID INTEGER PRIMARY KEY AUTOINCREMENT,
+            LicenseID INTEGER PRIMARY KEY,
             RequestID INTEGER,
-            LicenceType TEXT,
+            LicenseType TEXT,
             IsOffice BOOLEAN,
             OfficeName TEXT,
             OfficeServiceNumber TEXT,
             RequestDate DATE,
+            Activities TEXT,
             FOREIGN KEY (RequestID) REFERENCES Requests(RequestID)
         );`;
 
-    const createAccountRequestTable =
-        `CREATE TABLE IF NOT EXISTS AccountRequest (
-            AccountRequestID INTEGER PRIMARY KEY AUTOINCREMENT,
-            RequestID INTEGER,
-            RequesterName TEXT,
-            ApplicantName TEXT,
-            UserName TEXT,
-            ContactEmail TEXT,
-            FOREIGN KEY (RequestID) REFERENCES Requests(RequestID)
-        );`;
 
     const createInspectionRequestTable =
         `CREATE TABLE IF NOT EXISTS InspectionRequest (
-            InspectionRequestID INTEGER PRIMARY KEY AUTOINCREMENT,
+            InspectionID INTEGER PRIMARY KEY,
             RequestID INTEGER,
             InspectionDate DATE,
             InspectionTime TIME,
@@ -47,38 +57,31 @@ export async function setupDatabase() {
 
 
     const createAddActivity = 
-    `CREATE TABLE IF NOT EXISTS AddActivity(
-        AddActivityID INTEGER PRIMARY KEY AUTOINCREMENT,
-        RequestID INTEGER,
-        LicenceID TEXT,
-        FOREIGN KEY (RequestID) REFERENCES Requests(RequestID)
+        `CREATE TABLE IF NOT EXISTS AddActivity(
+            AddActivityID INTEGER PRIMARY KEY,
+            RequestID INTEGER,
+            LicenseID TEXT,
+            FOREIGN KEY (RequestID) REFERENCES Requests(RequestID)
     )`
 
     const createActivities = 
-    `CREATE TABLE IF NOT EXISTS Activity(
-        ActivityID INTEGER PRIMARY KEY AUTOINCREMENT,
-        AddActivityID INTEGER,
-        ActivityDescription TEXT NOT NULL,
-        FOREIGN KEY (AddActivityID) REFERENCES AddActivity(AddActivityID)
+        `CREATE TABLE IF NOT EXISTS Activity(
+            ActivityID INTEGER PRIMARY KEY,
+            AddActivityID INTEGER,
+            ActivityType TEXT NOT NULL,
+            FOREIGN KEY (AddActivityID) REFERENCES AddActivity(AddActivityID)
     )`
 
 
-    const createStampLicenceTable =
-    `CREATE TABLE IF NOT EXISTS StampLicence (
-        StampLicenceID INTEGER PRIMARY KEY AUTOINCREMENT,
-        RequestID INTEGER,
-        LicenceID TEXT UNIQUE NOT NULL,
-        RequestDate DATE NOT NULL,
-        FOREIGN KEY (RequestID) REFERENCES Requests(RequestID)
+    const createStampLicenseTable =
+        `CREATE TABLE IF NOT EXISTS StampLicense (
+            StampLicenseID TEXT PRIMARY KEY,
+            RequestID INTEGER,
+            LicenseID TEXT NOT NULL,
+            RequestDate DATE,
+            FOREIGN KEY (RequestID) REFERENCES Requests(RequestID)
     );`;
 
-    const createPermissionTable =
-    `CREATE TABLE IF NOT EXISTS Permissions(
-        PermissionID INTEGER PRIMARY KEY AUTOINCREMENT,
-        AccountRequestID INTEGER,
-        PermissionType TEXT NOT NULL,
-        FOREIGN KEY (AccountRequestID) REFERENCES AccountRequest(AccountRequestID)
-    );`;
 
     try {
         db.query(createRequestsTable).run();
@@ -87,7 +90,7 @@ export async function setupDatabase() {
         db.query(createInspectionRequestTable).run();
         db.query(createAddActivity).run();
         db.query(createActivities).run();
-        db.query(createStampLicenceTable).run();
+        db.query(createStampLicenseTable).run();
         db.query(createPermissionTable).run();
 
         // const tables = db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';`).all();

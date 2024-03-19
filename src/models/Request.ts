@@ -19,7 +19,8 @@ export async function insertRequest(params: insertRequestParams) {
     try {
         prepareQuery.run(requestId, requestType, requestStatus, companyName)
     } catch (error) {
-        console.log(`[CONSTRAIN ERROR] ${requestId} already exists in the database`)
+        console.log(error)
+        // console.log(`[CONSTRAIN ERROR] ${requestId} already exists in the database`)
     }
     
 }

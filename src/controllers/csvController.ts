@@ -1,4 +1,5 @@
 import { insertAccountRequest } from '../models/AccountRequest.ts';
+import { insertInspectionRequest } from '../models/InspectionRequest.ts';
 import { insertNewLicenseRequest } from '../models/NewLicenseRequest.ts';
 import {insertRequest} from '../models/Request.ts'
 import {parseCSV} from '../utils/csv-parser.ts'
@@ -75,13 +76,13 @@ async function processRow(row: RequestRow){
     await insertRequest({requestId, requestType, requestStatus, companyName})
    
     if (requestType == 1){
-        console.log(obj)
-        let licenceType = obj["LicenceType"]
+        let licenseType = obj["LicenseType"]
         let isOffice = obj["IsOffice"]
         let officeName = obj["OfficeName"]
         let officeServiceNumber = obj["OfficeServiceNumber"]
         let requestDate = obj["RequestDate"]
-        await insertNewLicenseRequest({requestId, licenceType, isOffice, officeName, officeServiceNumber, requestDate})
+        let activities = obj["Activities"]
+        await insertNewLicenseRequest({requestId, licenseType, isOffice, officeName, officeServiceNumber, requestDate, activities})
     }
 
     if (requestType == 2){
@@ -91,4 +92,13 @@ async function processRow(row: RequestRow){
         let contactEmail = obj["ContactEmail"]
         await insertAccountRequest({requestId, requesterName, applicantName, userName, contactEmail})
     }
+
+    if (requestType == 3){
+        console.log(obj)
+        let inspectionDate = obj["InspectionDate"]
+        let inspectionTime = obj["InspectionTime"]
+        let inspectionType = obj["inspectionType"]
+        await insertInspectionRequest({requestId, inspectionDate, inspectionTime, inspectionType})
+    }
+
 };
