@@ -15,31 +15,31 @@ export async function insertAccountRequest(params: NewLicenseRequestParams) {
     const insertAccountQuery = `INSERT INTO AccountRequest 
                 (RequestID, RequesterName, ApplicantName, UserName, ContactEmail) 
                 VALUES (?, ?, ?, ?, ?)`;
+                
+    const insertPermissionQuery = `INSERT INTO Permission (AccountID, PermissionType) VALUES (?, ?)`;
+
+    //prepare both queries
+    const prepareinsertAccount = db.prepare(insertAccountQuery);
+    const prepareinsertPermission = db.prepare(insertPermissionQuery);
 
 
-    try {
-        const prepareQuery = db.query(insertAccountQuery);
-        db.query("BEGIN").run();
-
-        prepareQuery.run(requestId, requesterName, applicantName, userName, contactEmail)
+    //Incase the insertion of Account request succeed, 
+    //while the insertion of the permissions failed, 
+    //rollback to avoid any inconsistency in the data
+    const insertTransaction = db.transaction(() => {
+        prepareinsertAccount.run(requestId, requesterName, applicantName, userName, contactEmail);
+        
+        //get the primary key of the inserted account request
         const lastIdResult:any = db.query("SELECT last_insert_rowid() as id").get();
-        const AccountID = lastIdResult['id'] 
-
-
-        // Example of further operations, like inserting related permissions
+        const AccountID = lastIdResult['id']
+        
+        //run the query for each permission
         permissions.forEach(async (permission) => {
-            const insertPermissionQuery = `INSERT INTO Permission (AccountID, PermissionType) VALUES (?, ?)`;
-            const prepareQuery = db.query(insertPermissionQuery);
-            prepareQuery.run(AccountID, permission)
+            prepareinsertPermission.run(AccountID, permission)
         });
+    });
 
-        db.query("COMMIT").run();
-    } catch (error) {
-
-        //in case the insertion of the account request was done successfully, 
-        //but one the permission insertion failed, we need to rollback to avoid any inconsistency in the data
-        db.query("ROLLBACK").run();
-        // console.log(`[CONSTRAIN ERROR] ${requestId} already exists in the database`)
-    }
-    
+    //start transaction
+    //If an exception is thrown, the transaction will be rolled back.
+    insertTransaction() 
 }
