@@ -18,8 +18,10 @@ export async function insertRequest(params: insertRequestParams) {
 
     try {
         prepareQuery.run(requestId, requestType, requestStatus, companyName)
+        return true;
     } catch (error) {
         console.log(error)
+        return false;
         // console.log(`[CONSTRAIN ERROR] ${requestId} already exists in the database`)
     }
     
