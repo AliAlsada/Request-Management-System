@@ -2,17 +2,11 @@ import { insertAccountRequest } from '../models/AccountRequest.ts';
 import { insertNewActivityRequest } from '../models/AddActivity.ts';
 import { insertInspectionRequest } from '../models/InspectionRequest.ts';
 import { insertNewLicenseRequest } from '../models/NewLicenseRequest.ts';
-import {insertRequest} from '../models/Request.ts'
 import { insertStampLicenseRequest } from '../models/StampLicense.ts';
 import { countRows } from '../models/statistics.ts';
+import {insertRequest} from '../models/Request.ts'
 import {parseCSV} from '../utils/csv-parser.ts'
 import { parseJSON } from '../utils/json-parser.ts';
-
-/**
- * Handles the CSV file upload and processing.
- * @param {Request} request - The incoming request object.
- * @return {Response} - The response to be sent back to the client.
- */
 
 
 // Define an interface for the row itself
@@ -118,48 +112,74 @@ async function processRow(row: RequestRow){
    if(!inserted) 
         return;
     
-    //New License
-    if (requestType == 1){
-        let licenseType = obj["LicenceType"]
-        let isOffice = obj["IsOffice"]
-        let officeName = obj["OfficeName"]
-        let officeServiceNumber = obj["OfficeServiceNumber"]
-        let requestDate = obj["RequestDate"]
-        let activities = obj["Activities"]
-        await insertNewLicenseRequest({requestId, licenseType, isOffice, officeName, officeServiceNumber, requestDate, activities});
-    }
+    await processRequestType(requestType, requestId, obj)
 
-    //Account Request
-    else if (requestType == 2){
-        let requesterName = obj["RequesterName"]
-        let applicantName = obj["ApplicantName"]
-        let userName = obj["UserName"]
-        let contactEmail = obj["ContactEmail"]
-        let permissions = obj["Permissions"]
-        await insertAccountRequest({requestId, requesterName, applicantName, userName, contactEmail, permissions})
-    }
-
-    //Inspection Request
-   else if (requestType == 3){
-        let inspectionDate = obj["InspectionDate"]
-        let inspectionTime = obj["InspectionTime"]
-        let inspectionType = obj["inspectionType"]
-        await insertInspectionRequest({requestId, inspectionDate, inspectionTime, inspectionType})
-    }
-
-    //Add New Activity
-    else if (requestType == 4){
-        let licenseId = obj["LicenceID"]
-        let activities = obj["Activities"]
-        await insertNewActivityRequest({requestId, licenseId, activities})
-    }
-
-    //Stamp License Letter
-    else if (requestType == 5){
-        let licenseId = obj["LicenceID"]
-        let requestDate = obj["RequestDate"]
-        await insertStampLicenseRequest({requestId, licenseId, requestDate})
-    }
 };
 
 
+async function processRequestType(requestType:number, requestId:number, obj:any) {
+    switch (requestType) {
+        case 1:
+            await handleNewLicense(requestId, obj);
+            break;
+
+        case 2:
+            await handleAccountRequest(requestId, obj);
+            break;
+
+        case 3:
+            await handleInspectionRequest(requestId, obj);
+            break;
+
+        case 4:
+            await handleNewActivity(requestId, obj);
+            break;
+
+        case 5:
+            await handleStampLicense(requestId, obj);
+            break;
+
+        default:
+            console.log("Unknown request type:", requestType);
+            break;
+    }
+}
+
+
+async function handleNewLicense(requestId:number, obj:any){
+    let licenseType = obj["LicenceType"]
+    let isOffice = obj["IsOffice"]
+    let officeName = obj["OfficeName"]
+    let officeServiceNumber = obj["OfficeServiceNumber"]
+    let requestDate = obj["RequestDate"]
+    let activities = obj["Activities"]
+    await insertNewLicenseRequest({requestId, licenseType, isOffice, officeName, officeServiceNumber, requestDate, activities});
+}
+
+async function handleAccountRequest(requestId:number, obj:any){
+    let requesterName = obj["RequesterName"]
+    let applicantName = obj["ApplicantName"]
+    let userName = obj["UserName"]
+    let contactEmail = obj["ContactEmail"]
+    let permissions = obj["Permissions"]
+    await insertAccountRequest({requestId, requesterName, applicantName, userName, contactEmail, permissions})
+}
+
+async function handleInspectionRequest(requestId:number, obj:any){
+    let inspectionDate = obj["InspectionDate"]
+    let inspectionTime = obj["InspectionTime"]
+    let inspectionType = obj["inspectionType"]
+    await insertInspectionRequest({requestId, inspectionDate, inspectionTime, inspectionType})
+}
+
+async function handleNewActivity(requestId:number, obj:any){
+    let licenseId = obj["LicenceID"]
+    let activities = obj["Activities"]
+    await insertNewActivityRequest({requestId, licenseId, activities})
+}
+
+async function handleStampLicense(requestId:number, obj:any){
+    let licenseId = obj["LicenceID"]
+    let requestDate = obj["RequestDate"]
+    await insertStampLicenseRequest({requestId, licenseId, requestDate})
+}
