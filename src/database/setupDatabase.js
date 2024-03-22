@@ -93,9 +93,6 @@ export async function setupDatabase() {
         db.query(createStampLicenseTable).run();
         db.query(createPermissionTable).run();
 
-        // const tables = db.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';`).all();
-        // console.log(tables);
-
         console.log("Database tables setup completed.");
     } catch (error) {
         console.error("Error setting up database tables:", error);

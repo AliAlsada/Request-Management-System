@@ -1,4 +1,4 @@
-// Helper function to parse JSON safely
+// Helper function to parse JSON
 export function parseJSON(jsonString: string) {
     try {
         return JSON.parse(jsonString);

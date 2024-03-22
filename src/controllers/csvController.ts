@@ -8,12 +8,13 @@ import { insertRequest } from "../models/Request.ts";
 import { parseCSV } from "../utils/csv-parser.ts";
 import { parseJSON } from "../utils/json-parser.ts";
 
+
 // Define an interface for the row itself
 interface RequestRow {
     RequestID: string;
     RequestType: string;
     RequestStatus: string;
-    RequestData: string; // This is a JSON string that can be parsed into RequestDataDetails
+    RequestData: string;
 }
 
 export async function upload(request: Request) {
@@ -41,6 +42,7 @@ export async function upload(request: Request) {
             status: 201,
             headers: { "Content-Type": "application/json" },
         });
+
     } catch (error) {
         console.error("Error during file upload and processing:", error);
         return new Response("Internal server error", { status: 500 });
@@ -106,16 +108,14 @@ async function processRow(row: RequestRow) {
         requestStatus,
         companyName,
     });
+
+    //if the insertion of the request failed, no need to check for its type
     if (!inserted) return;
 
     await processRequestType(requestType, requestId, obj);
 }
 
-async function processRequestType(
-    requestType: number,
-    requestId: number,
-    obj: any
-) {
+async function processRequestType( requestType: number, requestId: number, obj: any) {
     switch (requestType) {
         case 1:
             await handleNewLicense(requestId, obj);
@@ -150,6 +150,7 @@ async function handleNewLicense(requestId: number, obj: any) {
     let officeServiceNumber = obj["OfficeServiceNumber"];
     let requestDate = obj["RequestDate"];
     let activities = obj["Activities"];
+    
     await insertNewLicenseRequest({
         requestId,
         licenseType,
